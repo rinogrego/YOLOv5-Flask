@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLOv5 Inference App</title>
+</head>
+<body>
+    <h1>YOLOv5 Inference App</h1>
+    <form action="/predict" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".jpg, .jpeg, .png">
+        <button type="submit">Submit</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        // Optional: You can use JavaScript to update the UI with the inference results
+        // Fetch the results from the server and update the 'result' div
+        async function fetchResults() {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: new FormData(document.querySelector('form'))
+            });
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>
