@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
-import cv2
+
+from PIL import Image
 import numpy as np
 from ultralytics import YOLO, checks, hub
 from dotenv import load_dotenv
@@ -7,6 +8,7 @@ from dotenv import load_dotenv
 from utils import draw_bb, draw_original
 
 import os
+import io
 
 app = Flask(__name__)
 
@@ -33,7 +35,8 @@ def predict():
         return jsonify({"error": "No selected file"})
 
     try:
-        image = cv2.cvtColor(cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+        # image = cv2.cvtColor(cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+        image = np.asarray(Image.open(io.BytesIO(file.read())).convert("RGB"))
     except Exception as e:
         return jsonify({"error": f"Error processing image: {str(e)}"})
 
@@ -55,7 +58,7 @@ def predict():
     for cf, cl, xywhn in zip(boxes[0]["confidences"], boxes[0]["classes"], boxes[0]["xywhn"]):
         boxes_res.append((cf, cl, xywhn))
     
-    print(boxes_res)
+    # print(boxes_res)
     image_bb_encoded = draw_bb(image, file.filename, results)
     image_bb_html = f'data:image/png;base64,{image_bb_encoded}'
     
@@ -91,7 +94,8 @@ def api_predict():
         return jsonify({"error": "No selected file"})
 
     try:
-        image = cv2.cvtColor(cv2.imdecode(np.fromstring(file.read(), np.uint8), cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+        # image = cv2.cvtColor(cv2.imdecode(np.fromstring(file.read(), np.uint8), cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+        image = np.asarray(Image.open(io.BytesIO(file.read())).convert("RGB"))
     except Exception as e:
         return jsonify({"error": f"Error processing image: {str(e)}"})
 
@@ -109,7 +113,7 @@ def api_predict():
             "xywhn": result.boxes.xywhn.numpy().astype(np.float64).tolist() # because somehow np.float64 works while np.float32 didn't... Ref: https://github.com/numpy/numpy/issues/18994#issue-889585211
         })
     
-    print(boxes)
+    # print(boxes)
 
     return jsonify({"boxes": boxes})
 
