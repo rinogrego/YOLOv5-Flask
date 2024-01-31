@@ -44,8 +44,8 @@ seaborn==0.13.2
 six==1.16.0
 sympy==1.12
 thop==0.1.1.post2209072238
-torch==2.1.0+cpu
-torchvision==0.16.0+cpu
+torch
+torchvision
 tqdm==4.66.1
 typing_extensions==4.4.0
 tzdata==2023.4
